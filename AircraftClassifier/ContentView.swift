@@ -7,11 +7,15 @@
 
 import SwiftUI
 import PhotosUI
+import CoreML
+import Vision
 
 struct ContentView: View {
     @State private var photosPickerItem: PhotosPickerItem? = nil
     
     @State private var image: Image? = nil
+    
+    @State private var model: AircraftClassifierModel? = nil
     
     var body: some View {
         VStack {
@@ -20,10 +24,11 @@ struct ContentView: View {
             }
             .onChange(of: photosPickerItem) {
                 Task {
-                    // load the selected image.
                     if let data = try? await photosPickerItem?.loadTransferable(type: Data.self) {
                         if let selectedImage = UIImage(data: data) {
                             self.image = Image(uiImage: selectedImage)
+                    
+                            try await classifyImage(selectedImage)
                         }
                     }
                 }
@@ -37,6 +42,28 @@ struct ContentView: View {
         }
     }
     
+    func classifyImage(_ image: UIImage) async throws {
+        let configuration = MLModelConfiguration()
+        
+        guard let classifier = try? AircraftClassifierModel(configuration: configuration) else {
+            fatalError("error: unable to load Create ML aircraft classification model.")
+        }
+        
+        guard let model = try? VNCoreMLModel(for: classifier.model) else {
+            fatalError("error: unable to convert Create ML aircraft classification model to CoreML model.")
+        }
+        
+        let request = VNCoreMLRequest(model: model) { request, error in
+            if let results = request.results as? [VNClassificationObservation] {
+                print("classification: \(results.map(\.identifier))")
+                print("confidence: \(results.map(\.confidence))")
+            }
+        }
+        
+        let handler = VNImageRequestHandler(cgImage: image.cgImage!)
+        
+        try handler.perform([request])
+    }
 }
 
 #Preview {
