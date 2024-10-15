@@ -28,6 +28,7 @@ struct AircraftClassificationView: View {
                     // display the aircraft name
                     Text(aircraft?.name ?? "Unknown Aircraft")
                     
+                    // display the model classification confidence.
                     Text("Confidence: \(confidence * 100, specifier: "%.2f")%")
                 }
             }
