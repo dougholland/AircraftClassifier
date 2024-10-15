@@ -12,6 +12,8 @@ enum Aircraft: String, CaseIterable {
     
     case f16 = "F-16"
     
+    case f18 = "F-18"
+    
     case f22 = "F-22"
     
     case f35 = "F-35"
@@ -23,6 +25,9 @@ enum Aircraft: String, CaseIterable {
             
         case "f16":
             self = .f16
+            
+        case "f18":
+            self = .f18
             
         case "f22":
             self = .f22
@@ -42,6 +47,9 @@ enum Aircraft: String, CaseIterable {
             
         case .f16:
             return "F-16 Fighting Falcon"
+        
+        case .f18:
+            return "F-18 Super Hornet"
             
         case .f22:
             return "F-22 Raptor"
