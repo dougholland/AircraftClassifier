@@ -17,6 +17,12 @@ struct ContentView: View {
     
     @State private var model: AircraftClassifierModel? = nil
     
+    private let minumumConfidence: Double = 0.8
+    
+    @State private var displayClassification: Bool = false
+    
+    @State private var message: String? = nil
+    
     var body: some View {
         VStack {
             PhotosPicker(selection: $photosPickerItem, matching: .images) {
@@ -40,6 +46,11 @@ struct ContentView: View {
                     .scaledToFit()
             }
         }
+        .sheet(isPresented: $displayClassification) {
+            AircraftClassificationView(message: message, display: $displayClassification)
+                .presentationDetents([.fraction(0.5)])
+                .presentationDragIndicator(.visible)
+        }
     }
     
     func classifyImage(_ image: UIImage) async throws {
@@ -55,8 +66,13 @@ struct ContentView: View {
         
         let request = VNCoreMLRequest(model: model) { request, error in
             if let results = request.results as? [VNClassificationObservation] {
-                print("classification: \(results.map(\.identifier))")
-                print("confidence: \(results.map(\.confidence))")
+                if let aircraft = Aircraft(rawValue: results.first!.identifier) {
+                    print("classification: \(aircraft.name)")
+                    
+                    print("confidence: \(String(describing: results.first?.confidence))")
+                    
+                    displayClassification = true
+                }
             }
         }
         
