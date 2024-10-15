@@ -7,8 +7,12 @@
 
 import SwiftUI
 
+import Vision
+
 struct AircraftClassificationView: View {
     var aircraft: Aircraft? = nil
+    
+    var confidence: VNConfidence = 0.0
     
     @Binding var display: Bool
     
@@ -20,18 +24,22 @@ struct AircraftClassificationView: View {
                     .resizable()
                     .scaledToFit()
                 
-                // display the aircraft name
-                Text(aircraft?.name ?? "Unknown Aircraft")
+                VStack(alignment: .leading) {
+                    // display the aircraft name
+                    Text(aircraft?.name ?? "Unknown Aircraft")
+                    
+                    Text("Confidence: \(confidence * 100, specifier: "%.2f")%")
+                }
             }
-            .frame(maxHeight: 200)
             
             Button("Dismiss") {
                 display = false
             }
         }
+        .frame(maxHeight: 200)
     }
 }
 
 #Preview {
-    AircraftClassificationView(aircraft: Aircraft(rawValue: "f16"), display: .constant(true))
+    AircraftClassificationView(aircraft: Aircraft(rawValue: "f16"), confidence: 0.8, display: .constant(true))
 }
