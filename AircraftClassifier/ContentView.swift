@@ -21,7 +21,7 @@ struct ContentView: View {
     
     @State private var displayClassification: Bool = false
     
-    @State private var message: String? = nil
+    @State private var aircraft: Aircraft? = nil
     
     var body: some View {
         VStack {
@@ -30,6 +30,8 @@ struct ContentView: View {
             }
             .onChange(of: photosPickerItem) {
                 Task {
+                    image = nil
+                    
                     if let data = try? await photosPickerItem?.loadTransferable(type: Data.self) {
                         if let selectedImage = UIImage(data: data) {
                             self.image = Image(uiImage: selectedImage)
@@ -47,7 +49,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $displayClassification) {
-            AircraftClassificationView(message: message, display: $displayClassification)
+            AircraftClassificationView(aircraft: aircraft, display: $displayClassification)
                 .presentationDetents([.fraction(0.5)])
                 .presentationDragIndicator(.visible)
         }
@@ -67,6 +69,8 @@ struct ContentView: View {
         let request = VNCoreMLRequest(model: model) { request, error in
             if let results = request.results as? [VNClassificationObservation] {
                 if let aircraft = Aircraft(rawValue: results.first!.identifier) {
+                    self.aircraft = aircraft
+                    
                     print("classification: \(aircraft.name)")
                     
                     print("confidence: \(String(describing: results.first?.confidence))")
