@@ -23,6 +23,8 @@ struct ContentView: View {
     
     @State private var aircraft: Aircraft? = nil
     
+    @State private var confidence: VNConfidence = 0.0
+    
     var body: some View {
         VStack {
             PhotosPicker(selection: $photosPickerItem, matching: .images) {
@@ -49,7 +51,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $displayClassification) {
-            AircraftClassificationView(aircraft: aircraft, display: $displayClassification)
+            AircraftClassificationView(aircraft: aircraft, confidence: confidence, display: $displayClassification)
                 .presentationDetents([.fraction(0.5)])
                 .presentationDragIndicator(.visible)
         }
@@ -72,6 +74,8 @@ struct ContentView: View {
                     self.aircraft = aircraft
                     
                     print("classification: \(aircraft.name)")
+                    
+                    self.confidence = results.first?.confidence ?? 0.0
                     
                     print("confidence: \(String(describing: results.first?.confidence))")
                     
