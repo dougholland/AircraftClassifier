@@ -1,4 +1,4 @@
-# AircraftClassifier
+# Aircraft Classifier
 SwiftUI sample app that uses Create ML image classifier to identify aircraft. The model has been trained to classify the following aircraft:
 
 - F-15 Eagle
